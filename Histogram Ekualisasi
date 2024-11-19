@@ -1,0 +1,58 @@
+Achmad Ismasuroj
+23422012
+Teknik Informatika Pagi 2022
+Pengolahan Citra Digital
+
+script_content = """
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+def histogram_equalization(input_image_path, output_image_path):
+    # Load the input image in grayscale mode
+    img = cv2.imread(input_image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Compute the histogram of the image
+    hist, bins = np.histogram(img.flatten(), 256, [0, 256])
+
+    # Compute the cumulative distribution function (CDF)
+    cdf = hist.cumsum()
+    cdf_normalized = cdf * hist.max() / cdf.max()
+
+    # Mask all 0 values in CDF
+    cdf_masked = np.ma.masked_equal(cdf, 0)
+    cdf_equalized = (cdf_masked - cdf_masked.min()) * 255 / (cdf_masked.max() - cdf_masked.min())
+    cdf = np.ma.filled(cdf_equalized, 0).astype('uint8')
+
+    # Map the equalized CDF values to the original image
+    img_equalized = cdf[img]
+
+    # Save the output image
+    cv2.imwrite(output_image_path, img_equalized)
+
+    # Plot and save histograms
+    plt.figure(figsize=(10, 5))
+    plt.subplot(121)
+    plt.hist(img.flatten(), 256, [0, 256], color='r')
+    plt.title('Original Histogram')
+
+    plt.subplot(122)
+    plt.hist(img_equalized.flatten(), 256, [0, 256], color='g')
+    plt.title('Equalized Histogram')
+
+    plt.savefig("histogram_comparison.png")
+    plt.show()
+
+
+# Example usage
+input_image_path = "input_image.png"  # Change to your input image path
+output_image_path = "output_image.png"
+histogram_equalization(input_image_path, output_image_path)
+"""
+
+# Save the script to a local file
+script_path = "/mnt/data/histogram_equalization.py"
+with open(script_path, "w") as script_file:
+    script_file.write(script_content)
+
+script_path
